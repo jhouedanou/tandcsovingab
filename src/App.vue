@@ -1,5 +1,6 @@
 <template>
-  <div class="container">
+  <div class="container full-height">
+    <reouter-view />
     <h1 class="title is-3">Demande de suppression de compte</h1>
     <form @submit.prevent="submitForm">
       <div class="field">
@@ -48,6 +49,8 @@
 
 <script>
 export default {
+
+  name: 'App',
   data() {
     return {
       deletionUrl: '',
@@ -78,7 +81,8 @@ export default {
         });
         
         if (response.ok) {
-          alert('Demande envoyée avec succès !');
+          alert('Demande envoyée avec succès !');      this.$router.push('/merci');
+
           // Réinitialiser le formulaire
           Object.keys(this.$data).forEach(key => {
             this.$data[key] = '';
