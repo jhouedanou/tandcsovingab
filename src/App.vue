@@ -1,40 +1,40 @@
 <template>
-  <div class="container full-height">
-    <reouter-view />
+  <div class="container">
     <h1 class="title is-3">Demande de suppression de compte</h1>
+    
+    <div v-if="showAlert" class="notification is-success">
+      <button class="delete" @click="showAlert = false"></button>
+      Votre demande a été envoyée avec succès. Nous la traiterons dans les plus brefs délais.
+    </div>
+    
     <form @submit.prevent="submitForm">
       <div class="field">
-        <label class="label">URL de suppression de compte</label>
+        <label class="label">Nom d'utilisateur</label>
         <div class="control">
-          <input v-model="deletionUrl" class="input" type="url" placeholder="https://example.com/delete-account" required>
+          <input v-model="username" class="input" type="text" placeholder="Votre nom d'utilisateur" required>
         </div>
       </div>
       
       <div class="field">
-        <label class="label">Nom de l'application ou du développeur</label>
+        <label class="label">Email</label>
         <div class="control">
-          <input v-model="appName" class="input" type="text" placeholder="Nom de l'application" required>
+          <input v-model="email" class="input" type="email" placeholder="Votre adresse email" required>
         </div>
       </div>
       
       <div class="field">
-        <label class="label">Procédure de suppression</label>
+        <label class="label">Données à supprimer</label>
         <div class="control">
-          <textarea v-model="deletionProcedure" class="textarea" placeholder="Décrivez la procédure de suppression..." required></textarea>
+          <textarea v-model="dataToDelete" class="textarea" placeholder="Précisez les données que vous souhaitez supprimer..." required></textarea>
         </div>
       </div>
       
       <div class="field">
-        <label class="label">Types de données supprimées ou conservées</label>
         <div class="control">
-          <textarea v-model="dataHandling" class="textarea" placeholder="Précisez les types de données supprimées ou conservées..." required></textarea>
-        </div>
-      </div>
-      
-      <div class="field">
-        <label class="label">Durée de conservation supplémentaire</label>
-        <div class="control">
-          <input v-model="retentionPeriod" class="input" type="text" placeholder="Ex: 30 jours" required>
+          <label class="checkbox">
+            <input type="checkbox" v-model="confirmDeletion" required>
+            Je comprends que la suppression de mes données est irrévocable et sera effectuée dans un délai de 5 jours.
+          </label>
         </div>
       </div>
       
@@ -49,29 +49,27 @@
 
 <script>
 export default {
-
   name: 'App',
   data() {
     return {
-      deletionUrl: '',
-      appName: '',
-      deletionProcedure: '',
-      dataHandling: '',
-      retentionPeriod: ''
+      username: '',
+      email: '',
+      dataToDelete: '',
+      confirmDeletion: false,
+      showAlert: false
     }
   },
   methods: {
     async submitForm() {
       const formData = {
-        deletionUrl: this.deletionUrl,
-        appName: this.appName,
-        deletionProcedure: this.deletionProcedure,
-        dataHandling: this.dataHandling,
-        retentionPeriod: this.retentionPeriod
+        username: this.username,
+        email: this.email,
+        dataToDelete: this.dataToDelete,
+        confirmDeletion: this.confirmDeletion
       }
       
       try {
-        const response = await fetch('https://api.herotofu.com/v1/YOUR_FORM_ID', {
+        const response = await fetch('https://public.herotofu.com/v1/40ad7790-69d7-11ef-a422-43999971b585', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -81,12 +79,8 @@ export default {
         });
         
         if (response.ok) {
-          alert('Demande envoyée avec succès !');      this.$router.push('/merci');
-
-          // Réinitialiser le formulaire
-          Object.keys(this.$data).forEach(key => {
-            this.$data[key] = '';
-          });
+          this.showAlert = true;
+          this.resetForm();
         } else {
           throw new Error('Erreur lors de l\'envoi du formulaire');
         }
@@ -94,6 +88,12 @@ export default {
         console.error('Erreur:', error);
         alert('Une erreur est survenue. Veuillez réessayer.');
       }
+    },
+    resetForm() {
+      this.username = '';
+      this.email = '';
+      this.dataToDelete = '';
+      this.confirmDeletion = false;
     }
   }
 }
